@@ -41,6 +41,9 @@ public class NodeComponent extends JComponent {
      * @param node
      */
     public NodeComponent (Nodes node) {
+	if (node == null) {
+	    System.out.println ("NODES IS NULL!!!!!!!!!!!!!!!!!!!!!!!!!");
+	}
 	this.node = node;
 	
 	nodeSize = ScreenSize.NODESIZE;

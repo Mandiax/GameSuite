@@ -23,12 +23,8 @@ public class ImageHelper {
     public static BufferedImage veldLicht;
     public static BufferedImage veldDonkerWit;
     public static BufferedImage veldDonkerZwart;
-    public static BufferedImage veldLichtWit;
-    public static BufferedImage veldLichtZwart;
     
     static {
-	
-	//Relative paths dont work :(
 	try {
 	    veldDonker = ImageIO.read(new File ("GameSuiteMain/resource/img/VeldDonker.jpg"));
 	    veldLicht = ImageIO.read(new File ("GameSuiteMain/resource/img/VeldLicht2.jpg"));

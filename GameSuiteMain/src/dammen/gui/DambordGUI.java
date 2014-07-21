@@ -92,7 +92,7 @@ public class DambordGUI implements MouseListener, MouseMotionListener, Component
      * JPanel) wordt op basis van NodeComponents (visuele nodes, gekoppeld aan virtuele nodes) een visueel bord gecreeerd.
      * @see BordPanel
      */
-    public void maakDambord() {
+    public void maakDambord() {	
 	bord.addSpeelBord(dambord.getSpeelbord());
 	frame.pack();
     }
@@ -124,7 +124,7 @@ public class DambordGUI implements MouseListener, MouseMotionListener, Component
     /**
      * Overridden method to handle mouseClicks
      * Deze methode maakt het mogelijk om een selecteerbare Node aan te klikken, en deze - en de Nodes met mogelijke
-     * zetten - te highlighten. Vervolgens krijgen de nodes met een highlight een mouseListener toegewezen,
+     * zetten - te highlighten. Vervolgens krijgen de nodes met een highlight een mouseListener toegewezen (in updateBord()),
      * en krijgt de selectedNode variabele een referentie naar de geselecteerde Node.
      * Als de geselecteerde Node niet null is (i.e. een Node met mogelijke moves is geselecteerd), en er wordt een vrije 
      * nabijgelegenen Node aangeklikt, dan wordt de damsteen op de oorspronkelijke node verplaatst naar de nieuwe node.

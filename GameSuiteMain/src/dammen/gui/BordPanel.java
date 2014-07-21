@@ -3,7 +3,6 @@
  */
 package dammen.gui;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -39,42 +38,47 @@ public class BordPanel extends JPanel {
     /**
      * Krijgt het virtuele speelbord binnen, en koppelt de Nodes van het virtuele speelbord aan de 
      * Nodes (NodeComponents) van het visuele speelbord.
+     * 
+     * @remember Rare onvoorspelbare nullpointerException.. Oplossing: het daadwerkelijke toevoegen van componenten
+     * in een nieuwe methode (paintSpeelbord) doen. Waarschijnlijk ging het allemaal wat te snel voor de VM..
      * @param Nodes[][] speelbord
      */
     public void addSpeelBord (Nodes [][] speelbord) {
 	nodeList = null;
 	this.removeAll();
-	nodeList = new NodeComponent [ScreenSize.KOLOMMEN][ScreenSize.RIJEN];
+
+	paintSpeelbord(speelbord);
+	
+	this.repaint();
+    }
+    
+    /**
+     * Methode om de nodeList te vullen met nodeComponents die worden aangemaakt
+     * op basis van een Node uit het speelbord.
+     * @param speelbord
+     */
+    public void paintSpeelbord(Nodes[][] speelbord) {
+	nodeList = new NodeComponent [speelbord.length][speelbord[0].length];
+	
+	//System.out.println (speelbord.length + " " + speelbord[0].length);
 	
 	c.weightx = 1;
 	c.weighty = 1;	
 	c.fill = GridBagConstraints.BOTH;
 
-	for (int i = 0; i < ScreenSize.KOLOMMEN; i++) {
-	    for (int j = 0; j < ScreenSize.RIJEN; j++) {
+	for (int i = 0; i <= Coord.getKolommen(); i++) {
+	    for (int j = 0; j <= Coord.getRijen(); j++) {
 		c.gridx = i;
-		c.gridy = j;		
-		this.add(new NodeComponent(speelbord[i][ScreenSize.RIJEN -j - 1]), c);
+		c.gridy = j;
+		
+		NodeComponent nodeComp = new NodeComponent(speelbord[i][Coord.getRijen()-j]);
+				
+		nodeList[i][Coord.getRijen()-j] = nodeComp;
+		this.add(nodeComp, c);
 	    }
-	}	
-	this.repaint();
-    }
-    
-    /**
-     * Overridden functie voor het toevoegen van NodeComponents aan de nodeList array.
-     * Aangezien ik wil dat de locatie linksonder in beeld de 0,0 coordinaat bevat, moest ik
-     * op deze manier nodes toevoegen aan het BordPanel.
-     */
-    @Override
-    public void add(Component comp, Object constraints) {
-	// TODO Auto-generated method stub
-	super.add(comp, constraints);
-	
-	if (comp instanceof NodeComponent) {
-	    NodeComponent ncomp = (NodeComponent) comp;
-	    nodeList[ncomp.getCoord().getX()][ncomp.getCoord().getY()] = (NodeComponent) comp;
 	}
     }
+    
     
     /**
      * Haal een nodeComponent uit de lijst op basis van x en y coordinaat.
@@ -83,7 +87,7 @@ public class BordPanel extends JPanel {
      * @param y
      * @return
      */
-    public NodeComponent getNodeComponent (int x, int y) {
+    public NodeComponent getNodeComponent (int x, int y) {	
 	return nodeList[x][y];
     }
     

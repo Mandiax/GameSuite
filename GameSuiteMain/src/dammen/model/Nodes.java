@@ -125,12 +125,16 @@ public class Nodes {
      * @return Coord van node linksboven
      * @throws Exception 
      */
-    public Coord getCoordLeft() throws Exception {
-	if (this.damsteen.isOwnedByPlayer())
-	    //if ()
-	    return new Coord(this.coord.getX() - 1, this.coord.getY() + 1);
-	else 
-	    return new Coord(this.coord.getX() - 1, this.coord.getY() - 1);
+    public Coord getCoordLeft() {
+	try {
+	    if (this.damsteen.isOwnedByPlayer())
+		return new Coord(this.coord.getX() - 1, this.coord.getY() + 1);
+	    else 
+		return new Coord(this.coord.getX() - 1, this.coord.getY() - 1);
+	} catch (Exception e) {
+	    //System.out.println(e.getMessage());
+	    return null;
+	}
     }
 
     /**
@@ -139,11 +143,16 @@ public class Nodes {
      * @return Coord van node rechtsboven
      * @throws Exception 
      */
-    public Coord getCoordRight() throws Exception {
-	if (this.damsteen.isOwnedByPlayer()) {
-	    return new Coord(this.coord.getX() + 1, this.coord.getY() + 1);
-	} else {
-	    return new Coord(this.coord.getX() + 1, this.coord.getY() - 1);
+    public Coord getCoordRight() {
+	try {
+	    if (this.damsteen.isOwnedByPlayer()) {
+		return new Coord(this.coord.getX() + 1, this.coord.getY() + 1);
+	    } else {
+		return new Coord(this.coord.getX() + 1, this.coord.getY() - 1);
+	    }
+	} catch (Exception e) {
+	    //System.out.println(e.getMessage());
+	    return null;
 	}
     }
 

@@ -55,7 +55,7 @@ public class DamBord {
 	maakBord();
 	vulBord();
 	setMoves();
-	showMoves();
+	//showMoves();
     }
     
     public void setMoves () {
@@ -129,14 +129,27 @@ public class DamBord {
     }
     
     public void makeMove (Moves move) {
+	//Move van de speler.
 	move.makeMove();
 	setMoves();
 	
 	// Nu mag de AI.
+	Moves aiMove = ai.makeMove(speelbord);
+	aiMove.makeMove();
+	
+	//Highlight de move van de AI
+	aiMove.getCurrentNode().setHighLight(true);
+	aiMove.getTargetNode().setHighLight(true);
+	
+	//Moves opnieuw bepalen
+	setMoves();
     }
     
     public Nodes getNodeAt (Coord coord) {
-	return speelbord[coord.getX()][coord.getY()];
+	if (coord != null)
+	    return speelbord[coord.getX()][coord.getY()];
+	else 
+	    return null;
     }
     
     public Nodes getNodeAt (int x, int y) {
@@ -196,28 +209,12 @@ public class DamBord {
     public void setPossibleMoves (Nodes node) {
 	Coord coord = node.getCoord();
 	
-	try {
-	    // Kijk of er een vakje linksboven en rechtsboven vrij is:
-	    if ((coord.getX() >= 1 && coord.getX() < kolommen - 1)
-        	&& coord.getY() < rijen - 1) {
-       	    	if ( !getNodeAt(getNodeAt(coord).getCoordLeft()).hasDamsteen() )
-       	    	    node.getDamsteen().addMove(node, getNodeAt(getNodeAt(coord).getCoordLeft()) );
-       	    	if ( !getNodeAt(getNodeAt(coord).getCoordRight()).hasDamsteen() )
-       	    	    node.getDamsteen().addMove(node, getNodeAt(getNodeAt(coord).getCoordRight()) );
-       	    	// Kijk of er een vakje rechtsboven vrij is:
-	    } else if ((coord.getX() == 0 && coord.getX() < kolommen)
-        	&& coord.getY() < rijen - 1) {
-        	   if ( !getNodeAt(getNodeAt(coord).getCoordRight()).hasDamsteen() )
-        	       node.getDamsteen().addMove(node, getNodeAt(getNodeAt(coord).getCoordRight()) );
-        
-        	    // Kijk of er een vakje linksboven vrij is:
-	    } else if ((coord.getX() >= 1 && coord.getX() == kolommen - 1)
-		    && coord.getY() < rijen - 1) {
-		if (!getNodeAt(getNodeAt(coord).getCoordLeft()).hasDamsteen())
-        		node.getDamsteen().addMove(node, getNodeAt(getNodeAt(coord).getCoordLeft()) );
-        	} 
-	} catch (Exception e) {
-	    System.out.println (e.getMessage() + " at Node " + node.toString());
+	if (node.getCoordLeft() != null && !getNodeAt( node.getCoordLeft() ).hasDamsteen() )  {
+	    node.getDamsteen().addMove(node, getNodeAt(getNodeAt(coord).getCoordLeft()) );
+	} 
+	
+	if (node.getCoordRight() != null && !getNodeAt( node.getCoordRight() ).hasDamsteen() ) {
+	    node.getDamsteen().addMove(node, getNodeAt(getNodeAt(coord).getCoordRight()) );
 	}
     }
 
@@ -242,6 +239,9 @@ public class DamBord {
 		+ speelbord[1][1].toString());
     }
     
+    /**
+     * Test functie. Laat alle moves zien in de console.
+     */
     public void showMoves () {
 	for (int i = 0; i < kolommen; i++) {
 	    for (int j = 0; j < rijen; j++) {
