@@ -165,7 +165,7 @@ public class BlackJackSimpleFrame extends JFrame{
     	   	  String omzetter = bjMain.vraagKAART(spelerNummer, kaartNummer).toString();
     	   	  if (omzetter!= null){
     	   		  omzetter = omzetter+ ".png";
-    	   		  ImageIcon deckKaart = new ImageIcon ("blackjackdata/"+ omzetter +"");        		          	          	  
+    	   		  ImageIcon deckKaart = new ImageIcon ("src/blackjackdata/"+ omzetter +"");        		          	          	  
     	   		  spelerKaart.setIcon(deckKaart);
     	   	  	  kaartScherm.add(spelerKaart);        	  	  
     	   	  }     		 
