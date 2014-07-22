@@ -90,7 +90,7 @@ public class VierOpEenRijFrame extends JFrame{
           veld.repaint();
           break;
         }
-        herkenWinnaar();
+       // herkenWinnaar();
       }
     } 
   } 
