@@ -36,5 +36,14 @@ public class Kaarten {
 	public int getNummer(){
 		return nummer;
 	}
+	
+	public String toString(){
+		return kaartsoort +" met nummer: " +nummer +".";
+	}
+	
+	public void maakLeeg(){
+		nummer = 0;
+		kaartsoort = "leeg";
+	}
 
 }
