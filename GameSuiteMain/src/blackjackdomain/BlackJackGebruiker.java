@@ -2,12 +2,12 @@ package blackjackdomain;
 
 import java.util.ArrayList;
 
-public class BlackJackGebruiker implements BlackJackSpeler{  
-  double credits = 0.0;     
+public class BlackJackGebruiker extends BlackJackSpeler{  
+  int credits = 0;     
   boolean heeftBlackJack = false;
-  ArrayList <KAART> hand = null;  
+  ArrayList <BlackJackKaart> hand = null;  
   String naam = null;
-  double inzet = 0.0;
+  int inzet = 0;
   int score = 0;
   
   public BlackJackGebruiker (){    
@@ -15,8 +15,8 @@ public class BlackJackGebruiker implements BlackJackSpeler{
   }
   
   public void mijnInit(){
-    credits = 500.0;    
-    ArrayList <KAART> hand = new ArrayList <KAART> (); 
+    credits = 500;    
+    ArrayList <BlackJackKaart> hand = new ArrayList <BlackJackKaart> (); 
     this.hand=hand;
   }  
   
@@ -28,19 +28,19 @@ public class BlackJackGebruiker implements BlackJackSpeler{
 	this.naam = naam;
   }
       
-  public double getCredits() {    
+  public int getCredits() {    
     return credits;
   }
   
-  public void setCredits(double inzet) {   
+  public void setCredits(int inzet) {   
 	credits = credits - inzet;    
   }
   
-  public double getInzet (){
+  public int getInzet (){
     return inzet;
   }
 	  
-  public void setInzet(double inzet){    
+  public void setInzet(int inzet){    
     this.inzet = inzet;   
     this.setCredits(inzet);    
   }
@@ -53,6 +53,10 @@ public class BlackJackGebruiker implements BlackJackSpeler{
     heeftBlackJack = true;
   }  
   
+  public void setResetBlackJack(){
+	heeftBlackJack = false;  
+  }
+  
   public int getScore(){
     return score;
   }
@@ -61,11 +65,11 @@ public class BlackJackGebruiker implements BlackJackSpeler{
 	score = punten;
   }  
   
-  public void addKAART (KAART kaart){
+  public void addKAART (BlackJackKaart kaart){
     hand.add(kaart);
   }
   
-  public KAART getKAART (int index){
+  public BlackJackKaart getKAART (int index){
     hand.get(index);
     return (hand.get(index));
   }
