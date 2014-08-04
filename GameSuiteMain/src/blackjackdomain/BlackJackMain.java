@@ -4,56 +4,64 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
-import javax.swing.JFrame;
-
 /**
  * BlackJack
  * @author JJV
- *
+ * Gehanteerde spelregels in deze BlackJack versie:
+ *  - Verzekeren en Surrender zijn geen opties in dit spel
+ *  - AAS voor Bank telt altijd als 11 punten 
+ *  - de AI-spelers kunnen niet verdubbelen of splitsen
+ *  - Splitsen voor de gebruiker is alleen mogelijk bij dezelfde kaart ongeacht de waarde (dus 2 Heren of 2 Boeren, niet bij 10, Boer of Boer, Vrouw)
+ *  - bij de AI is een AAS 1 of 11 punten afhankelijk van de situatie
+ *  - Een speler heeft BlackJack wanneer de eerste 2 kaarten 21 punten waard zijn && de Bank geen mogelijkheid tot BlackJack heeft
+ *  - Een AI-speler met BlackJack krijgt geen nieuwe kaarten. De Gebruiker kan wel kiezen om een kaart aan te nemen
+ *  - Een BlackJack wordt aan het einde uitgekeerd als 2* de inzet
+ *  - Met het kiezen van "Verdubbelen" (Knop: Dubbel) krijgt de speler automatisch nog 1 kaart
  */
 
-public class BlackJackMain extends JFrame{
+public class BlackJackMain {
   private static final long serialVersionUID = 1L;
-  ArrayList <KAART> deck = null;  
+  ArrayList <BlackJackKaart> deck = null;  
   ArrayList <BlackJackSpeler> spelersLijst = null;
   ArrayList <String> namenLijst = new ArrayList<String>(
-	Arrays.asList("Jan", "Piet", "Klaas", "Mo", "Bert", "Hans", "Karel", "Remi",
-	"Pieter", "Peter", "Koen", "Patricia", "Johanna", "Anna", "Kofi", "Silvio"));
+			Arrays.asList("Jan", "Jozef", "Klaas", "Reimer", "Bert", "Hans", "Karel", "Remi",
+			"Pieter", "Peter", "Koen", "Patricia", "Johanna", "Anna", "Kofi", "Silvio", "George",
+			"Barack", "Mark", "Vladimir"));
+  ArrayList <String> wisselLijst = new ArrayList <String>();
   String naam = null;  
   int aantalAI = 0;
-  int aantalSpelers = 0;      
+  int aantalSpelers = 0;   
+  Random ran = new Random();
+  boolean isGesplitst = false;
   
- /*
+ /**
   * @param naam; naam van de speler, aantalAI; aantal computertegenstanders
   * Constructor
   */
   
   public BlackJackMain (String naam, int aantalAI){
     this.aantalAI = aantalAI;  
-    this.naam = naam;    
-    mijnInit();
+    this.naam = naam;     
+    mijnInit();        
     }  
   
   /*
-   * mijnInit; aanmaken deck kaarten op basis van aantal AI tegenstanders.
-   * Vullen van de spelersLijst met op [0] de bank en op [1] de speler, de overige plaatsen worden gevuld met AI-spelers
+   * mijnInit;  Vullen van de spelersLijst met op [0] de bank en op [1] de speler, de overige plaatsen worden gevuld met AI-spelers
    */
   
-  public void mijnInit(){  	    
+  public void mijnInit(){ 	
+	isGesplitst = false;
     ArrayList <BlackJackSpeler> spelersLijst = new ArrayList <BlackJackSpeler>();      
     this.spelersLijst = spelersLijst;
     spelersLijst.add(new BlackJackBank());
     spelersLijst.add(new BlackJackGebruiker());
-    spelersLijst.get(1).setNaam(naam);       
-    int teller = namenLijst.size();
-    for (int i=0; i<aantalAI; i++){    
-      Random ran = new Random();
-      int keuze = ran.nextInt(teller);
-      String keuzeNaam = namenLijst.get(keuze);
-      namenLijst.remove(keuze);
+    spelersLijst.get(1).setNaam(naam);     
+    for (int i=0; i<aantalAI; i++){      
+      int keuzeNummer = ran.nextInt(namenLijst.size());
+      String keuzeNaam = namenLijst.get(keuzeNummer);
+      namenLijst.remove(keuzeNummer);
       spelersLijst.add(new BlackJackAI());  
-      spelersLijst.get(i+2).setNaam(keuzeNaam);      
-      teller --;
+      spelersLijst.get(i+2).setNaam(keuzeNaam);       
     }   
     aantalSpelers = spelersLijst.size();       
   }
@@ -62,16 +70,23 @@ public class BlackJackMain extends JFrame{
    * @param de inzet van de speler voor het begin van het spel, zoals gevraagd in de gui
    * na het controleren van de inzet begint de eersteRonde. Hierna worden de kaarten ook gemaakt.
    */  
-  public boolean inZetten(double inzet){ 
+  public boolean inZetten(int inzet){ 	  
+	mutatieLijst();
 	clearHand();
-	BlackJackKaarten blackJackKaarten = new BlackJackKaarten();
-    deck = blackJackKaarten.maakDeck(aantalSpelers);
-    if (inzet <= spelersLijst.get(1).getCredits()){
-      this.spelersLijst.get(1).setInzet(inzet);      
-      for (int a=2; a<aantalSpelers; a++){
-        spelersLijst.get(a).setInzet(20.0);     
-      }          
-      eersteRonde(); 
+	clearBlackJack();	
+	if (spelersLijst.size()>2 && spelersLijst.get(spelersLijst.size()-1) instanceof BlackJackGebruiker){
+		spelersLijst.remove(spelersLijst.size()-1);
+		aantalSpelers --;
+	}
+	spelersLijst.get(1).setInzet(0);
+	BlackJackDeck blackJackKaarten = new BlackJackDeck();
+    deck = blackJackKaarten.maakDeck(aantalSpelers);   
+    if (inzet>0 && inzet <= spelersLijst.get(1).getCredits()){
+      spelersLijst.get(1).setInzet(inzet);      
+      for (int a=2; a<aantalSpelers; a++){     	
+        spelersLijst.get(a).setInzet(((int)Math.sqrt(spelersLijst.get(a).getCredits()))+(ran.nextInt(10)));      
+      }
+      deelKaartenUit(); 
       return true;             
     }
     else {    	
@@ -85,18 +100,15 @@ public class BlackJackMain extends JFrame{
    * Na dit begin van het spel volgt de Ronde voor de AI
    */
   
-  public void eersteRonde(){
+  public void deelKaartenUit(){
 	for (BlackJackSpeler a:spelersLijst){ 
       if (a instanceof BlackJackBank){
-        a.addKAART(deck.get(0));        
-        deck.remove(0);
+        geefKaart(spelersLijst.indexOf(a));
       }
-      else {a.addKAART(deck.get(0));        
-      	deck.remove(0);  
-        a.addKAART(deck.get(0));     
-        deck.remove(0); 
-        if (a.getKAART(0).getWaarde()+ a.getKAART(1).getWaarde()==21 && spelersLijst.get(0).getKAART(0).getWaarde()<10){
-            a.setCredits(-2*a.getInzet());            
+      else {
+    	geefKaart(spelersLijst.indexOf(a));
+    	geefKaart(spelersLijst.indexOf(a));      	
+        if (a.getKAART(0).getWaarde()+ a.getKAART(1).getWaarde()==21 && spelersLijst.get(0).getKAART(0).getWaarde()<10){                        
             a.setHeeftBlackJack();             
         }
       }
@@ -109,7 +121,7 @@ public class BlackJackMain extends JFrame{
    *  de totale score van de kaarten wordt berekend en opgeslagen in de instantie van de Speler
    */
   
-  public void ronde(){   // true als mijnInit mag starten  
+  public void ronde(){ 
     for (int i=2; i<aantalSpelers; i++){
       if (spelersLijst.get(i).getHeeftBlackJack()!= true){
         int score = 0;
@@ -128,30 +140,13 @@ public class BlackJackMain extends JFrame{
           score = score + deck.get(0).getWaarde();
           deck.remove(0);
         }        
-      } 
-      else {};
-    }   
-   if (spelersLijst.get(1).getHeeftBlackJack()== true){
-	     einde ();	     	     
-   }
-   else  {} // moet hierna naar focus invoer speler    
+      }       
+    }      
   }          
   
-  public void hit(){  // false is af. true is door
-    spelersLijst.get(1).addKAART(deck.get(0));    
-    deck.remove(0);    
-    int score = 0;
-    int aantalAzen = 0;    
-    for (int i=0; i<spelersLijst.get(1).handLengte(); i++){
-    	score = score + spelersLijst.get(1).getKAART(i).getWaarde();
-      if (spelersLijst.get(1).getKAART(i).getWaarde()==11){
-    	  aantalAzen ++;    	  
-      }      
-    }       
-    if (score -(aantalAzen*10)>21){        
-                
-    }       
-    else{}
+  public void hit(int spelerNummer){   
+    geefKaart(spelerNummer);   
+    berekenScore();    
   }    
   
   public void einde(){	  
@@ -163,18 +158,27 @@ public class BlackJackMain extends JFrame{
     }    
     berekenScore();
     for (BlackJackSpeler g:spelersLijst){
-      if (g instanceof BlackJackAI || g instanceof BlackJackGebruiker){
-      int eindScore = g.getScore();
-      if ((eindScore>bankScore && eindScore <22)||(bankScore>21 && eindScore<22)){
-    	  g.setCredits(-2*g.getInzet());        
+      if (g instanceof BlackJackAI){
+    	  int eindScore = g.getScore();
+    	  if ((eindScore>bankScore && eindScore <22)||(bankScore>21 && eindScore<22)){
+    		  g.setCredits(-2*g.getInzet());        
+    	  }
+    	  else if (eindScore==bankScore && eindScore <22){
+    		  g.setCredits(-1*g.getInzet());        
+    	  }
       }
-      else if (eindScore==bankScore && eindScore <22){
-    	  g.setCredits(-1*g.getInzet());        
-      }
-      else {}
-      }
-    }    
-  }  
+      else if (g instanceof BlackJackGebruiker){
+    	  int eindScore = g.getScore();
+    	  if ((eindScore>bankScore && eindScore <22)||(bankScore>21 && eindScore<22)){
+    		  spelersLijst.get(1).setCredits(-2*g.getInzet());        
+    	  }
+    	  else if (eindScore==bankScore && eindScore <22){
+    		  spelersLijst.get(1).setCredits(-1*g.getInzet());        
+    	  }              
+      }  
+    }
+    isGesplitst = false;
+  }
   
   public void berekenScore(){	  
 	  for (BlackJackSpeler b:spelersLijst){	
@@ -184,22 +188,81 @@ public class BlackJackMain extends JFrame{
 				  score = score + b.getKAART(d).getWaarde(); 
 		  }}
 		  else{	
-	      int aantalAAS = 0;
-		  for (int d=0; d<b.handLengte(); d++){
-			  score = score + b.getKAART(d).getWaarde();			  
-			  if (b.getKAART(d).getWaarde()==11 && b.getHeeftBlackJack()!=true){
-				  aantalAAS ++;
+			  int aantalAAS = 0;
+			  for (int d=0; d<b.handLengte(); d++){
+				  score = score + b.getKAART(d).getWaarde();			  
+				  if (b.getKAART(d).getWaarde()==11 && b.getHeeftBlackJack()!=true){
+					  aantalAAS ++;
+				  }
 			  }
-			  if (score>21 && aantalAAS!=0){
-				  score = score -10;
-			  }
-	  }   }
-	  b.setScore(score);
+			  while (score>21 && aantalAAS!=0){
+				  score = score - 10;
+				  aantalAAS --;				  
+			  }				  
+		  }			   		  
+		  b.setScore(score);
 	  }
   }   
   
   // HULPMETHODEN INTERN EN VOOR FRAME  
-  public void setSpelerCredits (int nummer, double credits){
+  public void mutatieLijst (){	  
+	  String wisselSpeler = null;
+	  for (int i=2; i<aantalSpelers; i++){
+		  if (spelersLijst.get(i).getCredits()<15){			  			  
+			  wisselSpeler = spelersLijst.get(i).getNaam();
+			  wisselLijst.add(spelersLijst.get(i).getNaam());
+			  spelersLijst.remove(i);
+			  int keuzeNummer = ran.nextInt(namenLijst.size());
+		      String keuzeNaam = namenLijst.get(keuzeNummer);
+		      namenLijst.remove(keuzeNummer);
+		      spelersLijst.add(new BlackJackAI());  
+		      spelersLijst.get(spelersLijst.size()-1).setNaam(keuzeNaam);
+		      wisselLijst.add(spelersLijst.get(spelersLijst.size()-1).getNaam());
+		      namenLijst.add(wisselSpeler);
+		  }
+	  }	  
+  }  
+  
+  public boolean splitsen (){
+	  String kaart1 = spelersLijst.get(1).getKAART(0).toString().substring(1);	  
+	  String kaart2 = spelersLijst.get(1).getKAART(1).toString().substring(1);	  
+	  if (vraagHandLengte(1)== 2 && isGesplitst == false && kaart1.equals(kaart2)){
+		  isGesplitst = true;		  
+		  spelersLijst.add(new BlackJackGebruiker());
+		  spelersLijst.get(spelersLijst.size()-1).setNaam(naam+"GESPLITST");
+		  spelersLijst.get(spelersLijst.size()-1).addKAART(spelersLijst.get(1).getKAART(1));
+		  BlackJackKaart overzetter = spelersLijst.get(1).getKAART(0);
+		  spelersLijst.get(1).clearHand();
+		  spelersLijst.get(1).addKAART(overzetter);		  
+		  spelersLijst.get(spelersLijst.size()-1).setInzet(spelersLijst.get(1).getInzet());		  
+		  spelersLijst.get(spelersLijst.size()-1).setCredits(500-spelersLijst.get(1).getCredits());	
+		  spelersLijst.get(1).setInzet(spelersLijst.get(1).getInzet());
+		  aantalSpelers++;		  		  
+		  return true;		  
+	  }
+	  else { return false;}
+  } 
+  
+  public void geefKaart(int spelerNummer){
+	  spelersLijst.get(spelerNummer).addKAART(deck.get(0));        
+      deck.remove(0);
+  }
+  
+  public void clearWisselLijst(){
+	  while (wisselLijst.size() != 0){
+		  wisselLijst.remove(0);
+	  }
+  }
+  
+  public String getWisselLijst(int spelerNummer){
+	  return wisselLijst.get(spelerNummer);
+  }
+  
+  public int getWisselLijstLengte(){	  
+	  return wisselLijst.size();
+  }  
+  
+  public void setSpelerCredits (int nummer, int credits){
 	  spelersLijst.get(nummer).setCredits(credits);
   }
   
@@ -221,6 +284,10 @@ public class BlackJackMain extends JFrame{
 	  }
   }
   
+  public void setInzet (int spelerNummer, int inzet){
+	  spelersLijst.get(spelerNummer).setInzet(inzet);
+  }
+  
   public int getAantalSpelers(){
 	  return aantalSpelers;
   }
@@ -234,7 +301,7 @@ public class BlackJackMain extends JFrame{
 	  return spelersLijst.get(spelernummer).handLengte();
   }
   
-  public KAART vraagKAART(int spelernummer, int kaartnummer){
+  public BlackJackKaart vraagKAART(int spelernummer, int kaartnummer){
 	  return spelersLijst.get(spelernummer).getKAART(kaartnummer);
   }
   
@@ -257,6 +324,20 @@ public class BlackJackMain extends JFrame{
   public boolean getHeeftBlackJack(int spelernummer){
 	  return spelersLijst.get(spelernummer).getHeeftBlackJack();
   } 
+  
+  public void clearBlackJack(){
+	  for (BlackJackSpeler a: spelersLijst){
+		  a.setResetBlackJack();
+	  }
+  }
+  
+  public boolean isGesplitst(){
+	  return isGesplitst;
+  }
+  
+  public void setGesplitstFalse(){
+	  isGesplitst = false;
+  }
  
   public static void main(String[] args) {   	  
   }

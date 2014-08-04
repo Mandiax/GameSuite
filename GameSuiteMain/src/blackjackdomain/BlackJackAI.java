@@ -1,38 +1,40 @@
 package blackjackdomain;
 
 import java.util.ArrayList;
+import java.util.Random;
 
-public class BlackJackAI implements BlackJackSpeler{
-  double credits = 0.0;     
+public class BlackJackAI extends BlackJackSpeler{
+  int credits = 0;     
   boolean heeftBlackJack = false;
-  ArrayList <KAART> hand = null;  
+  ArrayList <BlackJackKaart> hand = null;  
   String naam = null;
-  double inzet = 0.0;
+  int inzet = 0;
   int score = 0;
   
   public BlackJackAI (){       
     mijnInit();
     }
     
-    public void mijnInit(){
-      credits = 500.0;
-      ArrayList <KAART> hand = new ArrayList <KAART> (); 
+    private void mijnInit(){
+      Random ran = new Random(); 
+      credits = 400 + (ran.nextInt(200));      
+      ArrayList <BlackJackKaart> hand = new ArrayList <BlackJackKaart> (); 
       this.hand=hand;
     }  
   
-  public double getCredits() {    
+  public int getCredits() {    
     return credits;    
   }  
   
-  public void setCredits(double inzet) {    
+  public void setCredits(int inzet) {    
 	credits = credits - inzet;    
   }
   
-  public double getInzet (){
+  public int getInzet (){
     return inzet;
   }
   
-  public void setInzet(double inzet){
+  public void setInzet(int inzet){
     this.inzet = inzet;   
 	this.setCredits(inzet);
   }
@@ -61,13 +63,17 @@ public class BlackJackAI implements BlackJackSpeler{
 	score = punten;
   }
   
-  public void addKAART (KAART kaart){
+  public void addKAART (BlackJackKaart kaart){
     hand.add(kaart);
   }
   
-  public KAART getKAART (int index){
+  public BlackJackKaart getKAART (int index){
     hand.get(index);
     return (hand.get(index));
+  }
+  
+  public void setResetBlackJack(){
+	heeftBlackJack = false;  
   }
   
   public void clearHand (){    

@@ -1,26 +1,27 @@
 package blackjackdomain;
 
 // constructor
-public interface BlackJackSpeler {    
+public abstract class BlackJackSpeler {    
   
 // methoden  
-  String getNaam();
-  void setNaam(String naam);
+  String getNaam(){return "";} 
+  void setNaam(String naam){}
 	  
-  double getCredits();
-  void setCredits(double inzet);   
+  int getCredits(){return -1;}
+  void setCredits(int inzet){}   
   
-  double getInzet ();
-  void setInzet(double inzet);   
+  int getInzet(){return -1;}
+  void setInzet(int inzet){}   
   
-  boolean getHeeftBlackJack();
-  void setHeeftBlackJack();  
+  boolean getHeeftBlackJack(){return false;}
+  void setHeeftBlackJack(){}  
+  void setResetBlackJack(){}
   
-  void setScore(int punten);
-  int getScore();
+  void setScore(int punten){}
+  int getScore(){return -1;}
   
-  void addKAART (KAART kaart); 
-  KAART getKAART (int index);  
-  void clearHand();  
-  int handLengte();   
+  void addKAART (BlackJackKaart kaart){} 
+  BlackJackKaart getKAART (int index){return BlackJackKaart.HTWO;}  
+  void clearHand(){}  
+  int handLengte(){return -1;}  
 }
