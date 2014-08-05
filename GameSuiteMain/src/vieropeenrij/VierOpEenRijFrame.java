@@ -20,18 +20,16 @@ import javax.swing.JPanel;
  */
 public class VierOpEenRijFrame extends JFrame{
   
-  private static final int RIJEN = 6;
-  private static final int KOLOMMEN = 7;
-  private static final int RANDLENGTE = 50;
-  private static final int FRAME_BREEDTE = KOLOMMEN * RANDLENGTE;
-  private static final int FRAME_HOOGTE = RIJEN * RANDLENGTE;
+  private static final int FRAME_BREEDTE = Veld.KOLOMMEN * Veld.RANDLENGTE;
+  private static final int FRAME_HOOGTE = Veld.RIJEN * Veld.RANDLENGTE;
   private JPanel knoppenveld = null;
   private JButton knop = null;
   private Veld veld = new Veld();
-  private JButton[] knoppenArray = new JButton[KOLOMMEN];
+  private JButton[] knoppenArray = new JButton[Veld.KOLOMMEN];
   private Vakje[][] raster = veld.getRaster();
-  private int rijnummer = RIJEN - 1;
-  private int kolomnummer = KOLOMMEN - 1;
+  private int kolomnummer = Veld.KOLOMMEN - 1;
+  private Color kleur = null;
+  private int[] rijnummer = {5, 5, 5, 5, 5, 5, 5};
   
   public VierOpEenRijFrame(){
   super();
@@ -53,12 +51,12 @@ public class VierOpEenRijFrame extends JFrame{
    
     //maakt rij met knoppen
     knoppenveld = new JPanel();
-    knoppenveld.setLayout(new GridLayout(0, KOLOMMEN));
+    knoppenveld.setLayout(new GridLayout(0, Veld.KOLOMMEN));
     pane.add(knoppenveld, BorderLayout.NORTH);
     for(int i = 0; i < knoppenArray.length; i++){
       knoppenArray[i] = new JButton();
       knoppenArray[i].setText("" + (i + 1));
-      knoppenArray[i].setPreferredSize(new Dimension (RANDLENGTE, RANDLENGTE));
+      knoppenArray[i].setPreferredSize(new Dimension (Veld.RANDLENGTE, Veld.RANDLENGTE));
       knoppenArray[i].addActionListener(new KnopLuisteraar()); 
       knoppenveld.add(knoppenArray[i]);
     }  
@@ -67,48 +65,45 @@ public class VierOpEenRijFrame extends JFrame{
     pack();
   }
   
+  /**
+   * Main method: Toont het speelscherm
+   * @param args
+   */
   public static void main(String[] args) {
     VierOpEenRijFrame frame = new VierOpEenRijFrame();
     frame.setVisible(true);
     frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
   }
+    
+  /**
+   * Bepaalt welke kleur schijf er geplaatst wordt.
+   * @return kleur  de kleur van de schijf
+   */
+   private Color bepaalSpeler(){
+    if(veld.getBeurt() % 2 == 0){
+      kleur = Color.YELLOW;
+    }
+    else{
+      kleur = Color.RED;
+    }
+    return kleur;
+  }
   
-  public class KnopLuisteraar implements ActionListener{
+  /**
+   * Luisteraar voor het doen van een zet door een klik op de bijbehorende kolomknop.
+   * De schijf wordt geplaatst en er wordt gecontroleerd of er vier dezelfde kleuren op een rij liggen.
+   */
+   public class KnopLuisteraar implements ActionListener{
     public void actionPerformed(ActionEvent e){
       knop = (JButton) e.getSource();
       kolomnummer = Integer.parseInt(knop.getText()) - 1;
       veld.volgendeBeurt();
-      for(int i = rijnummer; i > 0; rijnummer--){
-        if(raster[kolomnummer][rijnummer].getGevuld() == false) {
-          raster[kolomnummer][rijnummer].setGevuld(true);
-          if(veld.getBeurt() % 2 == 0){
-            raster[kolomnummer][rijnummer].setKleur(Color.YELLOW);
-          }
-          else{
-            raster[kolomnummer][rijnummer].setKleur(Color.RED);
-          }
-          veld.repaint();
-          break;
-        }
-       // herkenWinnaar();
-      }
-    } 
-  } 
-  
-  /**
-   * Checkt of er vier schijfjes van dezelfde kleur op een rij liggen.
-   */
-/*  private void herkenWinnaar(){
-    for(int i = 0; i < KOLOMMEN -1; i++){
-      for(int j = 0; j < RIJEN - 1; j++){
-        Color kleur = raster[kolomnummer][rijnummer].getKleur();
-        if(kleur == raster[kolomnummer + 1][rijnummer].getKleur() &&
-            kleur == raster[kolomnummer + 2][rijnummer].getKleur() &&
-            kleur == raster[kolomnummer + 3][rijnummer].getKleur()){
-          System.out.println("Winnaar!");
-        }
-      }
+      bepaalSpeler();
+      raster[kolomnummer][rijnummer[kolomnummer]].setGevuld(true);
+      raster[kolomnummer][rijnummer[kolomnummer]].setKleur(kleur);
+      veld.repaint();
+      rijnummer[kolomnummer]--;
+      veld.herkenWinnaar();
     }
-  }
-*/  
+  } 
 }

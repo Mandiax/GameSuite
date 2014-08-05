@@ -7,6 +7,7 @@ import java.awt.Graphics2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 /**
@@ -16,9 +17,9 @@ import javax.swing.JPanel;
  */
 public class Veld extends JPanel{
   
-  private static final int RIJEN = 6;
-  private static final int KOLOMMEN = 7;
-  private static final int RANDLENGTE = 50;
+  protected static final int RIJEN = 6;
+  protected static final int KOLOMMEN = 7;
+  protected static final int RANDLENGTE = 50;
   private Rectangle2D rand = null;
   private Ellipse2D cirkel = null;
   private int beurt = 0;
@@ -36,7 +37,7 @@ public class Veld extends JPanel{
         raster[col][rij] = new Vakje (col, rij);
       }
     }
-    }
+  }
   
   /**
    * Tekent een vier-op-een-rij veld.
@@ -83,5 +84,107 @@ public class Veld extends JPanel{
    */
   public int getBeurt(){
     return beurt;
+  }
+    
+  /**
+   * Checkt of er vier schijfjes van dezelfde kleur op een rij liggen.
+   */
+  public void herkenWinnaar(){
+    winnaarHorizontaal();
+    winnaarVerticaal();
+    winnaarDiagonaalLR();
+    winnaarDiagonaalRL();
+  }
+  
+  /**
+   * Controleert of er horizontaal 4 schijven van dezelfde kleur op een rij staan.
+   * Indien dit het geval is verschijnt er een pop-up met de winnaar in beeld.
+   */
+  private void winnaarHorizontaal(){
+    for(int i = 0; i < KOLOMMEN - 3; i++){
+      for(int j = 0; j < RIJEN; j++){
+        if(raster[i][j].getKleur() == Color.YELLOW &&
+           raster[i + 1][j].getKleur() == Color.YELLOW &&
+           raster[i + 2][j].getKleur() == Color.YELLOW &&
+           raster[i + 3][j].getKleur() == Color.YELLOW){
+           JOptionPane.showMessageDialog(this, "Geel heeft gewonnen!");
+        }
+        if(raster[i][j].getKleur() == Color.red &&
+           raster[i + 1][j].getKleur() == Color.RED &&
+           raster[i + 2][j].getKleur() == Color.RED &&
+           raster[i + 3][j].getKleur() == Color.RED){
+           JOptionPane.showMessageDialog(this, "Rood heeft gewonnen!"); 
+        }
+      }
+    }
+  }
+  
+  /**
+   * Controleert of er verticaal 4 schijven van dezelfde kleur op een rij staan.
+   * Indien dit het geval is verschijnt er een pop-up met de winnaar in beeld.
+   */
+  private void winnaarVerticaal(){
+    for(int i = 0; i < KOLOMMEN; i++){
+      for(int j = 0; j < RIJEN - 3; j++){
+        if(raster[i][j].getKleur() == Color.YELLOW &&
+           raster[i][j + 1].getKleur() == Color.YELLOW &&
+           raster[i][j + 2].getKleur() == Color.YELLOW &&
+           raster[i][j + 3].getKleur() == Color.YELLOW){
+           JOptionPane.showMessageDialog(this, "Geel heeft gewonnen!");
+        }
+        if(raster[i][j].getKleur() == Color.red &&
+           raster[i][j + 1].getKleur() == Color.RED &&
+           raster[i][j + 2].getKleur() == Color.RED &&
+           raster[i][j + 3].getKleur() == Color.RED){
+           JOptionPane.showMessageDialog(this, "Rood heeft gewonnen!"); 
+        }
+      }
+    }
+  }
+  
+  /**
+   * Controleert of er diagonaal (linksboven naar rechtsonder) 4 schijven van dezelfde kleur op een rij staan.
+   * Indien dit het geval is verschijnt er een pop-up met de winnaar in beeld.
+   */
+  private void winnaarDiagonaalLR(){
+    for(int i = 0; i < KOLOMMEN -3; i++){
+      for(int j = 0; j < RIJEN - 3; j++){
+        if(raster[i][j].getKleur() == Color.YELLOW &&
+           raster[i + 1][j + 1].getKleur() == Color.YELLOW &&
+           raster[i + 2][j + 2].getKleur() == Color.YELLOW &&
+           raster[i + 3][j + 3].getKleur() == Color.YELLOW){
+           JOptionPane.showMessageDialog(this, "Geel heeft gewonnen!");
+        }
+        if(raster[i][j].getKleur() == Color.RED &&
+           raster[i + 1][j + 1].getKleur() == Color.RED &&
+           raster[i + 2][j + 2].getKleur() == Color.RED &&
+           raster[i + 3][j + 3].getKleur() == Color.RED){
+           JOptionPane.showMessageDialog(this, "Rood heeft gewonnen!"); 
+        }
+      }
+    }
+  }
+  
+  /**
+   * Controleert of er diagonaal (rechtsboven naar linksonder) 4 schijven van dezelfde kleur op een rij staan.
+   * Indien dit het geval is verschijnt er een pop-up met de winnaar in beeld.
+   */
+  private void winnaarDiagonaalRL(){
+    for(int i = KOLOMMEN - 4; i < KOLOMMEN - 1; i++){
+      for(int j = 0; j < RIJEN - 3; j++){
+        if(raster[i][j].getKleur() == Color.YELLOW &&
+           raster[i - 1][j + 1].getKleur() == Color.YELLOW &&
+           raster[i - 2][j + 2].getKleur() == Color.YELLOW &&
+           raster[i - 3][j + 3].getKleur() == Color.YELLOW){
+           JOptionPane.showMessageDialog(this, "Geel heeft gewonnen!");
+        }
+        if(raster[i][j].getKleur() == Color.RED &&
+           raster[i - 1][j + 1].getKleur() == Color.RED &&
+           raster[i - 2][j + 2].getKleur() == Color.RED &&
+           raster[i - 3][j + 3].getKleur() == Color.RED){
+           JOptionPane.showMessageDialog(this, "Rood heeft gewonnen!"); 
+        }
+      }
+    }
   }
 }
