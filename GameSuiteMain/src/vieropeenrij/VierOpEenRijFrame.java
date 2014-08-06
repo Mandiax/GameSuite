@@ -97,13 +97,15 @@ public class VierOpEenRijFrame extends JFrame{
     public void actionPerformed(ActionEvent e){
       knop = (JButton) e.getSource();
       kolomnummer = Integer.parseInt(knop.getText()) - 1;
-      veld.volgendeBeurt();
-      bepaalSpeler();
-      raster[kolomnummer][rijnummer[kolomnummer]].setGevuld(true);
-      raster[kolomnummer][rijnummer[kolomnummer]].setKleur(kleur);
-      veld.repaint();
-      rijnummer[kolomnummer]--;
-      veld.herkenWinnaar();
+      if(rijnummer[kolomnummer] > -1){
+        veld.volgendeBeurt();
+        bepaalSpeler();
+        raster[kolomnummer][rijnummer[kolomnummer]].setGevuld(true);
+        raster[kolomnummer][rijnummer[kolomnummer]].setKleur(kleur);
+        veld.repaint();
+        rijnummer[kolomnummer]--;
+        veld.herkenWinnaar();
+      }
     }
   } 
 }
